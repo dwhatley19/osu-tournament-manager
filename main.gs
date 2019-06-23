@@ -1,7 +1,3 @@
-// osu! tourney mastersheet script, v0.0.0001??
-// mainly authored by Not A Function, http://osu.ppy.sh/u/4773094
-// Please do not modify or distribute without permission.
-
 // main.gs: controller for all sheets
 // delegates work to other functions upon spreadsheet edit / form submit
 
