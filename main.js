@@ -55,4 +55,3 @@ function createSpreadsheetFormSubmitTrigger(){
      .onFormSubmit()
      .create();
 }
-

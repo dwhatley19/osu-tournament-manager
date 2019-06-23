@@ -148,4 +148,3 @@ function onQualsEdit(e, spreadsheet) {
     }
   }
 }
-

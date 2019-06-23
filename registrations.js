@@ -146,4 +146,3 @@ function computeCountries(e, spreadsheet) {
     }
   }
 }
-

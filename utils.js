@@ -214,4 +214,3 @@ function getRefData() {
   data.push(refsByNameID);
   return data;
 }
-
