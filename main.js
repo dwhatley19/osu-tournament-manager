@@ -28,10 +28,10 @@ function specialOnEdit(e) {
     }
   } else if (spreadsheet.getSheetName() == 'badge data') {
     computeCountries(e, spreadsheet);
+  } else if (spreadsheet.getSheetName() == 'Qualifiers schedules') {
+    onQualsEdit(e, spreadsheet.getSheetByName('Qualifiers schedules'));
   } else if (spreadsheet.getSheetName().indexOf('schedules') != -1) {
     setMatchResults(e, spreadsheet);
-  } else if (spreadsheet.getSheetName() == 'qualifiers') {
-    onQualsEdit(e, spreadsheet.getSheetByName('qualifiers'));
   }
   // TODO add more stuff here
 }

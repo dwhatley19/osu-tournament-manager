@@ -6,6 +6,7 @@ function isTriggerCell(row, col, spreadsheet) {
 
 // returns an array of teams in a given match,
 // given the cell used to trigger editing
+// returns a dictionary just in case we want to return more info
 function getInfoFromTriggerCell(row, col, spreadsheet) {
   var info = {};
   
