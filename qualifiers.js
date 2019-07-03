@@ -9,7 +9,7 @@ function isTriggerCell(row, col, spreadsheet) {
 // returns a dictionary just in case we want to return more info
 function getInfoFromTriggerCell(row, col, spreadsheet) {
   var info = {};
-  
+
   var maxTeams = 8;
   var teams = [];
   for (var i = col + 2; i < col + 2 + maxTeams; i++) {
@@ -17,14 +17,16 @@ function getInfoFromTriggerCell(row, col, spreadsheet) {
     if (team == "") break;
     teams.push(team);
   }
-  info['teams'] = teams;
-  
+  info["teams"] = teams;
+
   return info;
 }
 
 function setResultsFromTriggerCell(row, col, spreadsheet, results) {
-  var startRow = row, startCol = col + 2;
-  var numRows = results.length, numCols = results[0].length;
+  var startRow = row,
+    startCol = col + 2;
+  var numRows = results.length,
+    numCols = results[0].length;
   spreadsheet.getRange(startRow, startCol, numRows, numCols).setValues(results);
 }
 
@@ -41,7 +43,7 @@ function getTeamFromPlayerID(userID, allTeamsByID, matchTeams) {
   return -1;
 }
 
-// 
+//
 function computeQualsResults(matchInfo, allTeamsByID, matchTeams, mappool) {
   var data = [];
   var numMembersFound = [];
@@ -56,35 +58,36 @@ function computeQualsResults(matchInfo, allTeamsByID, matchTeams, mappool) {
     data.push(zeroArr);
     numMembersFound.push(zeroArr2);
   }
-  
+
   var expectedNumMembers = 2;
-  
+
   var defaultErrorText = "There were errors!";
   data.push([defaultErrorText]); // for error reporting
   var errorRow = mappool.length;
-  
+
   // generic errors
   var nonScoreV2 = false;
-  
+
   for (var i = 0; i < matchInfo.length; i++) {
     var map = matchInfo[i];
-    var bid = map['beatmap']['id'].toString();
+    var bid = map["beatmap"]["id"].toString();
     var row = mappool.indexOf(bid);
-    
+
     // ignore maps not in the mappool and report an error
     if (row == -1) {
-      data[errorRow][0] += " | map " + bid + " was played but is not in the mappool";
+      data[errorRow][0] +=
+        " | map " + bid + " was played but is not in the mappool";
       continue;
     }
-    
-    if (map['scoring_type'] != 'scorev2') nonScoreV2 = true;
-    
-    var scores = map['scores'];
+
+    if (map["scoring_type"] != "scorev2") nonScoreV2 = true;
+
+    var scores = map["scores"];
     for (var j = 0; j < scores.length; j++) {
-      var userID = scores[j]['user_id'].toString();
+      var userID = scores[j]["user_id"].toString();
       Logger.log(userID);
-      var score = scores[j]['score'];
-      
+      var score = scores[j]["score"];
+
       // find user ID in list of match teams
       var teamIndex = getTeamFromPlayerID(userID, allTeamsByID, matchTeams);
       if (teamIndex == -1) {
@@ -96,50 +99,63 @@ function computeQualsResults(matchInfo, allTeamsByID, matchTeams, mappool) {
       }
     }
   }
-  
+
   // make error messages for generic errors
   if (nonScoreV2) {
     data[errorRow][0] += " | some maps were not played using scoreV2!";
   }
-  
+
   for (var i = 0; i < mappool.length; i++) {
     for (var j = 0; j < matchTeams.length; j++) {
       if (numMembersFound[i][j] != expectedNumMembers) {
-        data[errorRow][0] += " | " + numMembersFound[i][j].toString() +
-          " members of team " + matchTeams[j] + " played for map " + mappool[i] + "!";
+        data[errorRow][0] +=
+          " | " +
+          numMembersFound[i][j].toString() +
+          " members of team " +
+          matchTeams[j] +
+          " played for map " +
+          mappool[i] +
+          "!";
       }
     }
   }
-  
+
   // clear error row if no errors
   if (data[errorRow][0] == defaultErrorText) {
     data[errorRow][0] = "";
   }
-  
+
   return data;
 }
 
 function onQualsEdit(e, spreadsheet) {
   if (isTriggerCell(e.range.getRow(), e.range.getColumn(), spreadsheet)) {
     var mappool = getMappool("Qualifiers mappool");
-    
+
     var allTeamsByName = getTeams();
     var allTeamsByID = getTeams(true);
-    
+
     var info = getInfoFromTriggerCell(
       e.range.getRow(),
-      e.range.getColumn(), 
+      e.range.getColumn(),
       spreadsheet
     );
-    var matchTeams = info['teams'];
-    var matchID = spreadsheet.getRange(e.range.getRow(), e.range.getColumn()).getValue();
+    var matchTeams = info["teams"];
+    var matchID = spreadsheet
+      .getRange(e.range.getRow(), e.range.getColumn())
+      .getValue();
     if (matchID.toString() != "") {
       Logger.log(matchTeams);
       Logger.log(allTeamsByID);
-      
+
       var matchInfo2 = matchInfo(matchID);
-      
-      var results = computeQualsResults(matchInfo2, allTeamsByID, matchTeams, mappool);
+
+      var results = computeQualsResults(
+        matchInfo2,
+        allTeamsByID,
+        matchTeams,
+        mappool
+      );
       setResultsFromTriggerCell(
         e.range.getRow(),
         e.range.getColumn(),
