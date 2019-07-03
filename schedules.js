@@ -112,3 +112,57 @@ function setMatchResults(e, spreadsheet) {
     }
   }
 }
+
+function createSchedules() {
+  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(
+    "RO32 schedules"
+  ); //getActiveSheet();
+  var sheetName = spreadsheet.getName();
+
+  var teamInfo = getTeams();
+  var teamTZs = {};
+  for (var team in teamInfo) {
+    teamTZs[team] = teamInfo[team].tz;
+  }
+
+  var metadata = getMetaInfo();
+
+  var team1Col = 3,
+    team2Col = 4,
+    matchTimeCol = 5;
+  var saturdayMatches = 0;
+  var maxSaturdayMatches = metadata[sheetName].numMatches / 2 + 1;
+  var startDate = metadata[sheetName].startDate;
+
+  for (var i = 2; i < 18; i++) {
+    var team1 = spreadsheet.getRange(i, team1Col).getValue();
+    var team2 = spreadsheet.getRange(i, team2Col).getValue();
+
+    // for example, "UTC-9" becomes -9 and "UTC" becomes 0
+    var tz1 = teamTZs[team1].substring(3);
+    var tz2 = teamTZs[team2].substring(3);
+    tz1 = tz1 == "" ? 0 : parseInt(tz1);
+    tz2 = tz2 == "" ? 0 : parseInt(tz2);
+
+    // the ideal time for the match, 16:00 local time
+    var idealTime = new Date(startDate);
+    idealTime.setHours(16, 0, 0);
+
+    var mintz = Math.min(tz1, tz2),
+      maxtz = Math.max(tz1, tz2);
+    var hourDiff = (mintz + maxtz) / 2;
+    if (maxtz - mintz > 12) {
+      hourDiff = (mintz + 24 + maxtz) / 2;
+    }
+
+    idealTime.setHours(idealTime.getHours() - hourDiff);
+
+    if (saturdayMatches > maxSaturdayMatches) {
+      idealTime.setHours(idealTime.getHours() + 24);
+    } else {
+      saturdayMatches++;
+    }
+
+    spreadsheet.getRange(i, matchTimeCol).setValue(idealTime);
+  }
+}

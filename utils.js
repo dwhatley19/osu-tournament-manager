@@ -232,3 +232,25 @@ function getRefData() {
   data.push(refsByNameID);
   return data;
 }
+
+function getMetaInfo() {
+  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(
+    "meta"
+  );
+
+  var maxRounds = 10;
+  var sheetNameCol = 1;
+  var startDateCol = 4;
+  var numMatchesCol = 5;
+
+  var metadata = {};
+  for (var i = 2; i < maxRounds; i++) {
+    var sheetName = spreadsheet.getRange(i, sheetNameCol).getValue();
+    metadata[sheetName] = {
+      startDate: spreadsheet.getRange(i, startDateCol).getValue(),
+      numMatches: spreadsheet.getRange(i, numMatchesCol).getValue()
+    };
+  }
+
+  return metadata;
+}
