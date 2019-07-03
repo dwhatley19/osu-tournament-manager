@@ -5,7 +5,11 @@ function findPlayersByTeamName(matchTeams) {
   var result = initial;
   var found = 0;
 
-  var allTeams = getTeams();
+  var teamInfo = getTeams();
+  var allTeams = {};
+  for (var team in teamInfo) {
+    allTeams[team] = teamInfo[team].players;
+  }
 
   for (var i = 0; i < matchTeams.length; i++) {
     for (var j = 0; j < allTeams[matchTeams[i]].length; j++) {

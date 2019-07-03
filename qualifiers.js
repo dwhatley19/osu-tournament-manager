@@ -85,7 +85,6 @@ function computeQualsResults(matchInfo, allTeamsByID, matchTeams, mappool) {
     var scores = map["scores"];
     for (var j = 0; j < scores.length; j++) {
       var userID = scores[j]["user_id"].toString();
-      Logger.log(userID);
       var score = scores[j]["score"];
 
       // find user ID in list of match teams
@@ -93,7 +92,6 @@ function computeQualsResults(matchInfo, allTeamsByID, matchTeams, mappool) {
       if (teamIndex == -1) {
         data[errorRow][0] += " | user ID " + userID + " not found";
       } else {
-        console.log(row);
         data[row][teamIndex] += score;
         numMembersFound[row][teamIndex]++;
       }
@@ -132,8 +130,12 @@ function onQualsEdit(e, spreadsheet) {
   if (isTriggerCell(e.range.getRow(), e.range.getColumn(), spreadsheet)) {
     var mappool = getMappool("Qualifiers mappool");
 
-    var allTeamsByName = getTeams();
-    var allTeamsByID = getTeams(true);
+    var teamInfo = getTeams();
+
+    var allTeamsByID = {};
+    for (var team in teamInfo) {
+      allTeamsByID[team] = teamInfo[team].ids;
+    }
 
     var info = getInfoFromTriggerCell(
       e.range.getRow(),
@@ -145,9 +147,6 @@ function onQualsEdit(e, spreadsheet) {
       .getRange(e.range.getRow(), e.range.getColumn())
       .getValue();
     if (matchID.toString() != "") {
-      Logger.log(matchTeams);
-      Logger.log(allTeamsByID);
-
       var matchInfo2 = matchInfo(matchID);
 
       var results = computeQualsResults(

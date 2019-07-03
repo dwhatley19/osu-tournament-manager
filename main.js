@@ -3,7 +3,6 @@
 
 function specialOnFormSubmit(e) {
   var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-  Logger.log(spreadsheet.getSheetName);
   if (spreadsheet.getSheetName() == "registrations") {
     handlePlayers(e, spreadsheet, false);
   }
@@ -12,12 +11,10 @@ function specialOnFormSubmit(e) {
 
 function specialOnEdit(e) {
   var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-  Logger.log(spreadsheet.getSheetName());
   // force compute?
   if (spreadsheet.getSheetName() == "registrations") {
     var forceComputeRow = 1;
     var forceComputeCol = 11;
-    Logger.log(e.range.getRow());
     if (
       e.range.getRow() == forceComputeRow &&
       e.range.getColumn() == forceComputeCol

@@ -40,9 +40,6 @@ function playerInfo(username) {
 
     if (start_idx == end_idx) return null;
 
-    Logger.log(start_idx);
-    Logger.log(end_idx);
-
     var json_data = text.substring(start_idx, end_idx - json_end.length);
     var data = JSON.parse(json_data);
 
@@ -62,9 +59,6 @@ function beatmapInfo(bid) {
     var end_idx = indexOf(text, json_end, start_idx);
 
     if (start_idx == end_idx) return null;
-
-    Logger.log(start_idx);
-    Logger.log(end_idx);
 
     var json_data = text.substring(start_idx, end_idx - json_end.length);
     var data = JSON.parse(json_data);
@@ -87,9 +81,6 @@ function matchInfo(mid) {
 
     if (start_idx == end_idx) return null;
 
-    Logger.log(start_idx);
-    Logger.log(end_idx);
-
     var json_data = text.substring(start_idx, end_idx - json_end.length);
     var data = JSON.parse(json_data);
 
@@ -106,7 +97,6 @@ function matchInfo(mid) {
       }
     }
 
-    Logger.log(res);
     return res;
   }
 }
@@ -124,8 +114,6 @@ function sendMessage(message, discordUrl) {
   };
 
   var response = UrlFetchApp.fetch(discordUrl, params);
-
-  Logger.log(response.getContentText());
 }
 
 // exponentiates base by a integer power
@@ -161,9 +149,7 @@ function getMappool(sheetName) {
 }
 
 // TODO specification
-function getTeams(byID) {
-  if (!byID) byID = false;
-
+function getTeams() {
   var spreadsheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(
     "Teams"
   );
@@ -180,32 +166,28 @@ function getTeams(byID) {
     var teamName = spreadsheet.getRange(i, 1).getValue();
     if (teamName == "") break;
 
-    teams[teamName] = [];
+    teams[teamName] = { players: [], ids: [] };
     for (var j = 0; j < numPlayers; j++) {
-      if (!byID) {
-        var playerName = spreadsheet
-          .getRange(i, playerCols[j])
-          .getValue()
-          .toString();
-        if (playerName == "") break;
-        teams[teamName].push(playerName);
-      } else {
-        var playerID = spreadsheet
-          .getRange(i, idCols[j])
-          .getValue()
-          .toString();
-        if (playerID == "") break;
-        teams[teamName].push(playerID);
-      }
+      var playerName = spreadsheet
+        .getRange(i, playerCols[j])
+        .getValue()
+        .toString();
+      if (playerName == "") break;
+      teams[teamName].players.push(playerName);
 
-      if (withTimezone) {
-        var tz = spreadsheet
-          .getRange(i, timezoneCol)
-          .getValue()
-          .toString();
-        if (tz == "") break;
-        teams[teamName].push(tz);
-      }
+      var playerID = spreadsheet
+        .getRange(i, idCols[j])
+        .getValue()
+        .toString();
+      if (playerID == "") break;
+      teams[teamName].ids.push(playerID);
+
+      var tz = spreadsheet
+        .getRange(i, timezoneCol)
+        .getValue()
+        .toString();
+      if (tz == "") break;
+      teams[teamName].tz = tz;
     }
   }
   return teams;
