@@ -57,7 +57,12 @@ function getMatchIDTimeRefTeams(sheets) {
           sheets[i].getRange(r, team2Col).getValue()
         ];
 
-        ans[sheetName].push([matchID, time, ref, teams]);
+        ans[sheetName].push({
+          matchID: matchID,
+          time: time,
+          ref: ref,
+          teams: teams
+        });
       }
     } else {
       ans[sheetName] = [];
@@ -95,7 +100,12 @@ function getMatchIDTimeRefTeams(sheets) {
           sheets[i]
         )["teams"];
 
-        ans[sheetName].push([matchID, time, ref, teams]);
+        ans[sheetName].push({
+          matchID: matchID,
+          time: time,
+          ref: ref,
+          teams: teams
+        });
 
         curLobby++;
         curRow += rowDiff;
@@ -119,10 +129,10 @@ function remindMatches() {
   for (var m in matchInfo) {
     var matchList = matchInfo[m];
     for (var i = 0; i < matchList.length; i++) {
-      var matchID = matchList[i][0];
-      var time = matchList[i][1];
-      var ref = matchList[i][2];
-      var teams = matchList[i][3];
+      var matchID = matchList[i].matchID;
+      var time = matchList[i].time;
+      var ref = matchList[i].ref;
+      var teams = matchList[i].teams;
 
       var now = new Date();
       var millisInHour = 3600 * 1000;
@@ -136,19 +146,12 @@ function remindMatches() {
             ">\nYou have a match (" +
             matchID +
             ") in less than an hour!";
-        } else if (ref == "") {
+        } else {
           message =
             refereesID +
             "\nThere is no referee for a match (" +
             matchID +
             ") that is happening in less than an hour!";
-        } else {
-          message =
-            "@" +
-            ref +
-            "\nYou have a match (" +
-            matchID +
-            ") in less than an hour!";
         }
 
         sendMessage(message + "\n" + findPlayersByTeamName(teams), discordUrl);
