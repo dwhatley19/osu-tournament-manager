@@ -137,21 +137,17 @@ function remindMatches() {
       var now = new Date();
       var millisInHour = 3600 * 1000;
       var diffInHours = (time - now) / millisInHour;
-      if (diffInHours > 0 && diffInHours < 1) {
+      if (diffInHours > 0 && diffInHours < 2) {
         var message = "";
         if (ref in refIDs) {
           message =
-            "<@" +
-            refIDs[ref] +
-            ">\nYou have a match (" +
-            matchID +
-            ") in less than an hour!";
+            "<@" + refIDs[ref] + ">\nYou have a match (" + matchID + ") soon!";
         } else {
           message =
             refereesID +
             "\nThere is no referee for a match (" +
             matchID +
-            ") that is happening in less than an hour!";
+            ") that is happening soon!";
         }
 
         sendMessage(message + "\n" + findPlayersByTeamName(teams), discordUrl);
