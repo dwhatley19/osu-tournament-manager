@@ -138,12 +138,19 @@ function getMappool(sheetName) {
   var mappool = [];
   for (var i = 2; i < maxMaps; i++) {
     if (spreadsheet.getRange(i, 1).getValue() == "") break;
-    mappool.push(
-      spreadsheet
-        .getRange(i, 1)
-        .getValue()
-        .toString()
-    );
+    var id = spreadsheet
+      .getRange(i, 1)
+      .getValue()
+      .toString();
+    var code = spreadsheet
+      .getRange(i, 2)
+      .getValue()
+      .toString();
+    var name = spreadsheet
+      .getRange(i, 4)
+      .getValue()
+      .toString();
+    mappool.push({ id: id, code: code, name: name });
   }
   return mappool;
 }
