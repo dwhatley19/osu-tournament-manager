@@ -29,7 +29,7 @@ function findPlayersByTeamName(matchTeams) {
   return result;
 }
 
-// returns {sheetName: [[matchID, time, ref, [team1, ...]], ...], ...}
+// returns {sheetName: [[matchID, time, ref, streamer, [team1, ...]], ...], ...}
 function getMatchIDTimeRefTeams(sheets) {
   var ans = {};
   for (var i = 0; i < sheets.length; i++) {
@@ -43,13 +43,19 @@ function getMatchIDTimeRefTeams(sheets) {
       var matchIdCol = 2;
       var matchTimeCol = 5;
       var refCol = 11;
+      var streamerCol = refCol + 1;
       var maxRows = 50;
       var team1Col = 3,
         team2Col = 4;
       var firstRow = 2;
+      var postedCol = 26;
 
       for (var r = firstRow; r < maxRows; r++) {
+        var posted = sheets[i].getRange(r, postedCol).getValue();
+        if (posted == "yes") continue;
+
         var ref = sheets[i].getRange(r, refCol).getValue();
+        var streamer = sheets[i].getRange(r, streamerCol).getValue();
         var matchID = sheets[i].getRange(r, matchIdCol).getValue();
         var time = new Date(sheets[i].getRange(r, matchTimeCol).getValue());
         var teams = [
@@ -61,6 +67,7 @@ function getMatchIDTimeRefTeams(sheets) {
           matchID: matchID,
           time: time,
           ref: ref,
+          streamer: streamer,
           teams: teams
         });
       }
@@ -132,6 +139,7 @@ function remindMatches() {
       var matchID = matchList[i].matchID;
       var time = matchList[i].time;
       var ref = matchList[i].ref;
+      var streamer = matchList[i].streamer;
       var teams = matchList[i].teams;
 
       var now = new Date();
@@ -142,6 +150,9 @@ function remindMatches() {
         if (ref in refIDs) {
           message =
             "<@" + refIDs[ref] + ">\nYou have a match (" + matchID + ") soon!";
+          if (streamer != "") {
+            message = message.concat(" It will be streamed by " + streamer);
+          }
         } else {
           message =
             refereesID +
