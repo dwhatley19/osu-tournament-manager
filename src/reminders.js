@@ -146,14 +146,15 @@ function remindMatches() {
       var now = new Date();
       var millisInHour = 3600 * 1000;
       var diffInHours = (time - now) / millisInHour;
-      Logger.log(ref + " " + diffInHours.toString());
       if (diffInHours > 0 && diffInHours < 2) {
         var message = "";
         if (ref in refIDs) {
           message =
             "<@" + refIDs[ref] + ">\nYou have a match (" + matchID + ") soon!";
-          if (streamer != "") {
-            message = message.concat(" It will be streamed by " + streamer);
+          if (streamer != "" && streamer in refIDs) {
+            message = message.concat(
+              " It will be streamed by <@" + refIDs[streamer] + ">"
+            );
           }
         } else {
           message =

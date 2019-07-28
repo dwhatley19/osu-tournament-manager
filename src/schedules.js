@@ -75,7 +75,6 @@ function setMatchResults(e, spreadsheet) {
     }
 
     var mappool = getMappool(mappoolStage + " mappool");
-    Logger.log(mappool);
     for (var i = 0; i < mappool.length; i++) {
       if (redBanID.indexOf(mappool[i].code) >= 0) {
         redBanIDs.push(mappool[i].code);
