@@ -247,15 +247,35 @@ function getMetaInfo() {
 
   var maxRounds = 10;
   var sheetNameCol = 1;
-  var startDateCol = 4;
-  var numMatchesCol = 5;
+  var startDateCol = 13;
+  var minMatchCol = 3;
+  var maxMatchCol = 4;
+  var lbMaxMatch1Col = 8;
+  var lbMaxMatch2Col = 9;
+  var wbStageCol = 2;
+  var lbStage1Col = 10;
+  var lbStage2Col = 11;
+  var wbBestToCol = 5;
+  var lbBestToCol = 7;
+  var wbMapStageCol = 6;
+  var lbMapStageCol = 12;
 
   var metadata = {};
   for (var i = 2; i < maxRounds; i++) {
     var sheetName = spreadsheet.getRange(i, sheetNameCol).getValue();
     metadata[sheetName] = {
       startDate: spreadsheet.getRange(i, startDateCol).getValue(),
-      numMatches: spreadsheet.getRange(i, numMatchesCol).getValue()
+      minMatch: spreadsheet.getRange(i, minMatchCol).getValue(),
+      maxMatch: spreadsheet.getRange(i, maxMatchCol).getValue(),
+      lbMaxMatch1: spreadsheet.getRange(i, lbMaxMatch1Col).getValue(),
+      lbMaxMatch2: spreadsheet.getRange(i, lbMaxMatch2Col).getValue(),
+      wbStage: spreadsheet.getRange(i, wbStageCol).getValue(),
+      lbStage1: spreadsheet.getRange(i, lbStage1Col).getValue(),
+      lbStage2: spreadsheet.getRange(i, lbStage2Col).getValue(),
+      wbBestTo: spreadsheet.getRange(i, wbBestToCol).getValue(),
+      lbBestTo: spreadsheet.getRange(i, lbBestToCol).getValue(),
+      wbMapStage: spreadsheet.getRange(i, wbMapStageCol).getValue(),
+      lbMapStage: spreadsheet.getRange(i, lbMapStageCol).getValue()
     };
   }
 

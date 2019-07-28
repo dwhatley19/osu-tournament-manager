@@ -12,6 +12,7 @@ function findPlayersByTeamName(matchTeams) {
   }
 
   for (var i = 0; i < matchTeams.length; i++) {
+    if (!(matchTeams[i] in allTeams)) continue;
     for (var j = 0; j < allTeams[matchTeams[i]].length; j++) {
       var playerName = allTeams[matchTeams[i]][j];
       if (playerName != "") result += "@" + playerName + " ";
@@ -145,6 +146,7 @@ function remindMatches() {
       var now = new Date();
       var millisInHour = 3600 * 1000;
       var diffInHours = (time - now) / millisInHour;
+      Logger.log(ref + " " + diffInHours.toString());
       if (diffInHours > 0 && diffInHours < 2) {
         var message = "";
         if (ref in refIDs) {

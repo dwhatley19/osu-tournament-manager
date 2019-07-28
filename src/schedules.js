@@ -21,7 +21,10 @@ function setMatchResults(e, spreadsheet) {
       }
     }
 
-    var matchID = spreadsheet.getRange("B" + r).getValue();
+    var matchID = spreadsheet
+      .getRange("B" + r)
+      .getValue()
+      .toString();
     var redTeam = "`" + spreadsheet.getRange("C" + r).getValue() + "`";
     var blueTeam = "`" + spreadsheet.getRange("D" + r).getValue() + "`";
     var redScore = spreadsheet.getRange("O" + r).getValue();
@@ -35,57 +38,52 @@ function setMatchResults(e, spreadsheet) {
     var rdScore = spreadsheet.getRange("W" + r).getValue();
     var mpLink = spreadsheet.getRange("X" + r).getValue();
     var posted = spreadsheet.getRange("Z" + r).getValue();
-    var redBan = "",
-      blueBan = "",
+    var redBanIDs = [],
+      blueBanIDs = [];
+    var redBans = [],
+      blueBans = [],
       rdBan = "";
 
-    // fix this... please...
     var maxScore = 3;
     var stage = "Group Stage";
-    if (spreadsheet.getSheetName() == "RO32 schedules") {
-      maxScore = 4;
-      stage = "RO32";
-    } else if (spreadsheet.getSheetName() == "RO16 schedules") {
-      maxScore = 4;
-      stage = "RO16";
-    } else if (
-      spreadsheet.getSheetName() == "QF schedules" &&
-      matchID.substring(0, 2) == "WB"
-    ) {
-      maxScore = 5;
-      stage = "QF";
-    } else if (spreadsheet.getSheetName() == "QF schedules") {
-      maxScore = 4;
-      stage = "QF";
-    } else if (
-      spreadsheet.getSheetName() == "SF schedules" &&
-      matchID.substring(0, 2) == "WB"
-    ) {
-      maxScore = 6;
-      stage = "SF";
-    } else if (spreadsheet.getSheetName() == "SF schedules") {
-      maxScore = 5;
-      stage = "SF";
-    } else if (
-      spreadsheet.getSheetName() == "Finals schedules" &&
-      matchID.substring(0, 2) == "WB"
-    ) {
-      maxScore = 7;
-      stage = "Finals";
-    } else if (spreadsheet.getSheetName() == "Finals schedules") {
-      maxScore = 6;
-      stage = "Finals";
-    } else if (spreadsheet.getSheetName() == "Grand Finals schedules") {
-      maxScore = 7;
-      stage = "Grand Finals";
-    }
-    // END fix this... please...
+    var mappoolStage = "";
 
-    var mappool = getMappool(stage + " mappool");
+    var metadata = getMetaInfo();
+    for (var sheetName in metadata) {
+      if (
+        spreadsheet.getSheetName() == sheetName &&
+        parseInt(matchID.substring(0, 2)) < metadata[sheetName].lbMaxMatch1
+      ) {
+        maxScore = metadata[sheetName].lbBestTo;
+        stage = metadata[sheetName].lbStage1;
+        mappoolStage = metadata[sheetName].lbMapStage;
+        break;
+      } else if (
+        spreadsheet.getSheetName() == sheetName &&
+        parseInt(matchID.substring(0, 2)) < metadata[sheetName].lbMaxMatch2
+      ) {
+        maxScore = metadata[sheetName].lbBestTo;
+        stage = metadata[sheetName].lbStage2;
+        mappoolStage = metadata[sheetName].lbMapStage;
+        break;
+      } else if (spreadsheet.getSheetName() == sheetName) {
+        maxScore = metadata[sheetName].wbBestTo;
+        stage = metadata[sheetName].wbStage;
+        mappoolStage = metadata[sheetName].wbMapStage;
+        break;
+      }
+    }
+
+    var mappool = getMappool(mappoolStage + " mappool");
+    Logger.log(mappool);
     for (var i = 0; i < mappool.length; i++) {
-      if (mappool[i].code == redBanID) redBan = mappool[i].name;
-      else if (mappool[i].code == blueBanID) blueBan = mappool[i].name;
-      else if (mappool[i].code == rdBanID) rdBan = mappool[i].name;
+      if (redBanID.indexOf(mappool[i].code) >= 0) {
+        redBanIDs.push(mappool[i].code);
+        redBans.push(mappool[i].name);
+      } else if (blueBanID.indexOf(mappool[i].code) >= 0) {
+        blueBanIDs.push(mappool[i].code);
+        blueBans.push(mappool[i].name);
+      } else if (mappool[i].code == rdBanID) rdBan = mappool[i].name;
     }
 
     // comments included to simulate an example match results message
@@ -119,10 +117,14 @@ function setMatchResults(e, spreadsheet) {
       // MP Link: <https://osu.ppy.sh/community/matches/53152575>
       resultsCell += "MP Link: <" + mpLink + ">\n\n";
       resultsCell += "**Bans:**\n";
-      resultsCell +=
-        "__" + redTeam + "__\n**" + redBanID + "** | " + redBan + "\n";
-      resultsCell +=
-        "__" + blueTeam + "__\n**" + blueBanID + "** | " + blueBan + "\n";
+      resultsCell += "__" + redTeam + "__\n";
+      for (var i = 0; i < redBans.length; i++) {
+        resultsCell += "**" + redBanIDs[i] + "** | " + redBans[i] + "\n";
+      }
+      resultsCell += "__" + blueTeam + "__\n";
+      for (var i = 0; i < blueBans.length; i++) {
+        resultsCell += "**" + blueBanIDs[i] + "** | " + blueBans[i] + "\n";
+      }
 
       if (rdBan != "N/A") {
         resultsCell += "Redemption ban:\n**" + rdBanID + "** | " + rdBan;
@@ -159,7 +161,7 @@ function setMatchResults(e, spreadsheet) {
 
 function createSchedules() {
   var spreadsheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(
-    "RO32 schedules"
+    "SF schedules"
   ); //getActiveSheet();
   var sheetName = spreadsheet.getName();
 
@@ -175,12 +177,27 @@ function createSchedules() {
     team2Col = 4,
     matchTimeCol = 5;
   var saturdayMatches = 0;
-  var maxSaturdayMatches = metadata[sheetName].numMatches / 2 + 1;
+
+  var maxSaturdayMatches =
+    (metadata[sheetName].maxMatch - metadata[sheetName].minMatch + 1) / 2;
+  if (
+    metadata[sheetName].lbMaxMatch1 < 0 ||
+    metadata[sheetName].lbMaxMatch2 < 0
+  ) {
+    // include matches from WB and LB round n, not LB round n+1
+    maxSaturdayMatches =
+      metadata[sheetName].lbMaxMatch1 - metadata[sheetName].minMatch + 1;
+    maxSaturdayMatches +=
+      metadata[sheetName].maxMatch - metadata[sheetName].lbMaxMatch2;
+  }
+
   var startDate = metadata[sheetName].startDate;
 
-  for (var i = 2; i < 18; i++) {
+  for (var i = 2; i < 32; i++) {
     var team1 = spreadsheet.getRange(i, team1Col).getValue();
     var team2 = spreadsheet.getRange(i, team2Col).getValue();
+
+    if (!(team1 in teamTZs && team2 in teamTZs)) continue;
 
     // for example, "UTC-9" becomes -9 and "UTC" becomes 0
     var tz1 = teamTZs[team1].substring(3);
@@ -188,9 +205,9 @@ function createSchedules() {
     tz1 = tz1 == "" ? 0 : parseInt(tz1);
     tz2 = tz2 == "" ? 0 : parseInt(tz2);
 
-    // the ideal time for the match, 16:00 local time
+    // the ideal time for the match, 18:00 local time
     var idealTime = new Date(startDate);
-    idealTime.setHours(16, 0, 0);
+    idealTime.setHours(18, 0, 0);
 
     var mintz = Math.min(tz1, tz2),
       maxtz = Math.max(tz1, tz2);
@@ -201,7 +218,7 @@ function createSchedules() {
 
     idealTime.setHours(idealTime.getHours() - hourDiff);
 
-    if (saturdayMatches > maxSaturdayMatches) {
+    if (saturdayMatches >= maxSaturdayMatches) {
       idealTime.setHours(idealTime.getHours() + 24);
     } else {
       saturdayMatches++;
