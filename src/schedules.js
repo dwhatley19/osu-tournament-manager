@@ -52,7 +52,7 @@ function setMatchResults(e, spreadsheet) {
     for (var sheetName in metadata) {
       if (
         spreadsheet.getSheetName() == sheetName &&
-        parseInt(matchID.substring(0, 2)) < metadata[sheetName].lbMaxMatch1
+        parseInt(matchID.substring(0, 2)) <= metadata[sheetName].lbMaxMatch1
       ) {
         maxScore = metadata[sheetName].lbBestTo;
         stage = metadata[sheetName].lbStage1;
@@ -60,7 +60,7 @@ function setMatchResults(e, spreadsheet) {
         break;
       } else if (
         spreadsheet.getSheetName() == sheetName &&
-        parseInt(matchID.substring(0, 2)) < metadata[sheetName].lbMaxMatch2
+        parseInt(matchID.substring(0, 2)) <= metadata[sheetName].lbMaxMatch2
       ) {
         maxScore = metadata[sheetName].lbBestTo;
         stage = metadata[sheetName].lbStage2;
