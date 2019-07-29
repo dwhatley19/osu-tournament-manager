@@ -61,13 +61,3 @@ function onOpen() {
     .addItem("Go!", "createSchedules")
     .addToUi();
 }
-
-function menuItem1() {
-  SpreadsheetApp.getUi() // Or DocumentApp or FormApp.
-    .alert("You clicked the first menu item!");
-}
-
-function menuItem2() {
-  SpreadsheetApp.getUi() // Or DocumentApp or FormApp.
-    .alert("You clicked the second menu item!");
-}
