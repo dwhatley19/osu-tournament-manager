@@ -159,9 +159,7 @@ function setMatchResults(e, spreadsheet) {
 }
 
 function createSchedules() {
-  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(
-    "SF schedules"
-  ); //getActiveSheet();
+  var spreadsheet = SpreadsheetApp.getActiveSheet();
   var sheetName = spreadsheet.getName();
 
   var teamInfo = getTeams();
@@ -180,8 +178,8 @@ function createSchedules() {
   var maxSaturdayMatches =
     (metadata[sheetName].maxMatch - metadata[sheetName].minMatch + 1) / 2;
   if (
-    metadata[sheetName].lbMaxMatch1 < 0 ||
-    metadata[sheetName].lbMaxMatch2 < 0
+    metadata[sheetName].lbMaxMatch1 >= 0 ||
+    metadata[sheetName].lbMaxMatch2 >= 0
   ) {
     // include matches from WB and LB round n, not LB round n+1
     maxSaturdayMatches =
